@@ -34,3 +34,13 @@ def create_user_item(db: Session, item: schemas.TodoItemCreate, user_id: int):
     db.commit()
     db.refresh(db_item)
     return db_item
+
+
+def update_user_item(db: Session, item: schemas.TodoItemUpdate, item_id: int):
+    db_item = db.query(models.TodoItem).filter(models.TodoItem.id == item_id).first()
+    db_item.title = item.title
+    db_item.description = item.description
+    db_item.is_on = item.is_on
+    db.commit()
+    db.refresh(db_item)
+    return db_item

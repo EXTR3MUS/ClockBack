@@ -1,6 +1,7 @@
 from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
@@ -9,6 +10,19 @@ from .database import SessionLocal, engine
 models.Base.metadata.create_all(bind=engine)
 
 app = FastAPI()
+
+origins = [
+    "http://localhost",
+    "http://localhost:3000",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 
 # Dependency
@@ -54,4 +68,12 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
 
+
+@app.put("/items/{item_id}", response_model=schemas.TodoItem)
+def update_item(item_id: int, item: schemas.TodoItemUpdate, db: Session = Depends(get_db)):
+    return crud.update_user_item(db=db, item_id=item_id, item=item)
+
+# ..\venvs\fastapi_venv\Scripts\activate
 # uvicorn todoApp.main:app --reload
+# https://fastapi.tiangolo.com/tutorial/security/first-steps/
+# https://github.com/borys25ol/fastapi-todo-example-app
