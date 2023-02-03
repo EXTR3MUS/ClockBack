@@ -14,6 +14,7 @@ app = FastAPI()
 origins = [
     "http://localhost",
     "http://localhost:3000",
+    "http://localhost:3001",
 ]
 
 app.add_middleware(
@@ -73,7 +74,13 @@ def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
 def update_item(item_id: int, item: schemas.TodoItemUpdate, db: Session = Depends(get_db)):
     return crud.update_user_item(db=db, item_id=item_id, item=item)
 
-# ..\venvs\fastapi_venv\Scripts\activate
+
+@app.delete("/items/{item_id}", response_model=schemas.TodoItem)
+def delete_item(item_id: int, db: Session = Depends(get_db)):
+    return crud.delete_user_item(db=db, item_id=item_id)
+
+
+# %USERPROFILE%/Documents/WORK/venvs/fastapi_venv/Scripts/activate.bat
 # uvicorn todoApp.main:app --reload
 # https://fastapi.tiangolo.com/tutorial/security/first-steps/
 # https://github.com/borys25ol/fastapi-todo-example-app
