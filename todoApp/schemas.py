@@ -7,6 +7,7 @@ class TodoItemBase(BaseModel):
     description: Union[str, None] = None
     is_on: bool = True
 
+
 class TodoItemCreate(TodoItemBase):
     pass
 
@@ -30,6 +31,22 @@ class UserBase(BaseModel):
 
 class UserCreate(UserBase):
     password: str
+
+
+class TodoItemTagBase(BaseModel):
+    tag_name: str
+
+
+class TodoItemTag(TodoItemTagBase):
+    id: int
+    owner_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class TodoItemTagCreate(TodoItemTagBase):
+    pass
 
 
 class User(UserBase):

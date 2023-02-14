@@ -80,6 +80,18 @@ def delete_item(item_id: int, db: Session = Depends(get_db)):
     return crud.delete_user_item(db=db, item_id=item_id)
 
 
+@app.post("/users/{user_id}/tags/", response_model=schemas.TodoItemTag)
+def create_tag_for_user(
+    user_id: int, tag: schemas.TodoItemTagCreate, db: Session = Depends(get_db)
+):
+    return crud.create_user_tag(db=db, tag=tag, user_id=user_id)
+
+
+@app.get("/tags/", response_model=List[schemas.TodoItemTag])
+def read_tags(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    tags = crud.get_tags(db, skip=skip, limit=limit)
+    return tags
+
 # %USERPROFILE%/Documents/WORK/venvs/fastapi_venv/Scripts/activate.bat
 # uvicorn todoApp.main:app --reload
 # https://fastapi.tiangolo.com/tutorial/security/first-steps/
