@@ -77,3 +77,14 @@ def delete_user_tag(db: Session, tag_id: int):
     db.commit()
     return db_tag
 
+
+def create_todo_list(db: Session, todo_list: schemas.TodoListCreate, user_id: int):
+    db_todo_list = models.TodoList(**todo_list.dict(), owner_id=user_id)
+    db.add(db_todo_list)
+    db.commit()
+    db.refresh(db_todo_list)
+    return db_todo_list
+
+
+def get_todo_lists(db: Session, skip: int = 0, limit: int = 100):
+    return db.query(models.TodoList).offset(skip).limit(limit).all()

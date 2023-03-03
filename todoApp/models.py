@@ -13,7 +13,7 @@ class User(Base):
 
     todo_items = relationship("TodoItem", back_populates="owner")
     tags = relationship("TodoItemTag", back_populates="owner")
-    todo_lists = relationship("TodoItemList", back_populates="owner")
+    todo_lists = relationship("TodoList", back_populates="owner")
 
 
 class TodoItem(Base):
@@ -25,7 +25,7 @@ class TodoItem(Base):
     is_on = Column(Boolean, default=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
     tag_id = Column(Integer, ForeignKey("todo_item_tags.id"))
-    list_id = Column(Integer, ForeignKey("todo_item_lists.id"))
+    list_id = Column(Integer, ForeignKey("todo_lists.id"))
 
     owner = relationship("User", back_populates="todo_items")
 
@@ -40,11 +40,12 @@ class TodoItemTag(Base):
     owner = relationship("User", back_populates="tags")
 
 
-class TodoItemList(Base):
-    __tablename__ = "todo_item_lists"
+class TodoList(Base):
+    __tablename__ = "todo_lists"
 
     id = Column(Integer, primary_key=True, index=True)
     list_name = Column(String, index=True)
     owner_id = Column(Integer, ForeignKey("users.id"))
+    date = Column(String, index=True)
 
     owner = relationship("User", back_populates="todo_lists")

@@ -56,3 +56,20 @@ class User(UserBase):
 
     class Config:
         orm_mode = True
+
+
+class TodoListBase(BaseModel):
+    list_name: str
+    date: str
+
+
+class TodoList(TodoListBase):
+    id: int
+    owner_id: int
+
+    class Config:
+        orm_mode = True
+
+
+class TodoListCreate(TodoListBase):
+    pass

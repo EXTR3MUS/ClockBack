@@ -2,6 +2,8 @@ from typing import List
 
 from fastapi import Depends, FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from .fastapi_utils_tasks import repeat_every
+import datetime
 from sqlalchemy.orm import Session
 
 from . import crud, models, schemas
@@ -64,7 +66,7 @@ def create_item_for_user(
     return crud.create_user_item(db=db, item=item, user_id=user_id)
 
 
-@app.get("/items/", response_model=List[schemas.TodoItem])
+@app.get("/todoitems/", response_model=List[schemas.TodoItem])
 def read_items(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     items = crud.get_items(db, skip=skip, limit=limit)
     return items
@@ -91,6 +93,32 @@ def create_tag_for_user(
 def read_tags(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
     tags = crud.get_tags(db, skip=skip, limit=limit)
     return tags
+
+
+@app.get("/todolists/", response_model=List[schemas.TodoList])
+def read_todolists(skip: int = 0, limit: int = 100, db: Session = Depends(get_db)):
+    todolists = crud.get_todo_lists(db, skip=skip, limit=limit)
+    return todolists
+
+# creating todolists on startup
+@app.on_event("startup")
+async def startup_event():
+    db = SessionLocal()
+    
+    if(not crud.get_user(db, 1)):
+        crud.create_user(db, schemas.UserCreate(email="test", password="test"))
+
+    if(not crud.get_todo_lists(db, 1)):
+        date = datetime.datetime.now().strftime("%d/%m/%Y")
+        crud.create_todo_list(db, schemas.TodoListCreate(list_name="first list", date=date), 1)
+
+
+# create tasklist everyday
+@repeat_every(seconds=86400)
+async def create_tasklist():
+    db = SessionLocal()
+    date = datetime.datetime.now().strftime("%d/%m/%Y")
+    crud.create_todo_list(db, schemas.TodoListCreate(list_name="first list", date=date), 1)
 
 # %USERPROFILE%/Documents/WORK/venvs/fastapi_venv/Scripts/activate.bat
 # uvicorn todoApp.main:app --reload
